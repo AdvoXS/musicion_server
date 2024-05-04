@@ -1,3 +1,3 @@
 FROM openjdk:21
-COPY build/libs/musicion-0.0.1.war musicion-0.0.1.war
-ENTRYPOINT ["java","-jar","/musicion-0.0.1.war"]
+COPY build/libs/musicion-*.*.*.war musicion-server.war
+ENTRYPOINT ["java","-jar","/musicion-server.war"]
