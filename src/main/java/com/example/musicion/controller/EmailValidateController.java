@@ -4,13 +4,13 @@ import com.example.musicion.model.auth.EmailValidate;
 import com.example.musicion.model.auth.User;
 import com.example.musicion.repository.EmailValidateRepository;
 import com.example.musicion.repository.UserRepository;
+import com.example.musicion.service.EmailValidateService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/mail")
+@RequestMapping("/open-api")
 public class EmailValidateController {
     @Autowired
     EmailValidateRepository emailValidateRepository;
@@ -31,14 +30,17 @@ public class EmailValidateController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    EmailValidateService emailValidateService;
+
     @Value("${client_address}")
     private String clientAddress;
 
     @Value("${client_port}")
     private String clientPort;
 
-    @PostMapping("/validate")
-    @NotBlank
+    @PostMapping("/mail/validate")
+    @Transactional
     @ApiResponse(responseCode = "200", description = "Письмо отправлено")
     @ApiResponse(responseCode = "404", description = "Пользователь из тела запроса не найден")
     @ApiResponse(responseCode = "409", description = "Пользователь из тела запроса уже активирован")
@@ -52,24 +54,8 @@ public class EmailValidateController {
         User user = userOptional.get();
         if (user.isEnabled())
             return new ResponseEntity<>(HttpStatus.CONFLICT);
-        List<EmailValidate> validateRecords = emailValidateRepository.findAllByUsername(userName);
-        long currentTime = System.currentTimeMillis();
-        Date currentDate = new Date(currentTime);
-        validateRecords.stream().filter(e -> e.getExpired().compareTo(new Date(currentTime)) > 0).forEach(e -> {
-            e.setExpired(new java.sql.Date(currentTime));
-            emailValidateRepository.save(e);
-        });
-        EmailValidate emailValidate = createEmailValidate(userName, currentDate);
-        emailValidateRepository.save(emailValidate);
+        emailValidateService.createEmailValidate(user.getUsername(), user.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    private EmailValidate createEmailValidate(String userName, Date currentDate) {
-        EmailValidate emailValidate = new EmailValidate();
-        emailValidate.setUsername(userName);
-        emailValidate.setExpired(new java.sql.Date(DateUtils.addDays(currentDate, 1).getTime()));
-        emailValidate.setActivate(false);
-        return emailValidate;
     }
 
     @GetMapping(value = "/validate")

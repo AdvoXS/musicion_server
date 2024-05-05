@@ -30,10 +30,8 @@ public class WebSecurityConfiguration {
                 )
         );
         http.authorizeHttpRequests(req -> {
-            req.requestMatchers("/mail/**").permitAll();
-            req.requestMatchers("/swagger-ui/**").permitAll();
-            req.requestMatchers("/swagger-ui.html").permitAll();
-            req.requestMatchers("/v3/api-docs/**").permitAll();
+            req.requestMatchers("/mail/**", "/swagger-ui/**", "/swagger-ui.html",
+                    "/v3/api-docs/**", "/open-api/**").permitAll();
             req.anyRequest().authenticated();
         });
         http.httpBasic(Customizer.withDefaults());
