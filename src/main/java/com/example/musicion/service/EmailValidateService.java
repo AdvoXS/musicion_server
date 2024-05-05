@@ -40,7 +40,7 @@ public class EmailValidateService {
 
     private void sendEmailValidate(String email, Long code) {
         mailSenderService.sendSimpleMessage(email, "Подтверждение аккаунта musicion", "Подтвердите аккаунт по ссылке" +
-                " http:\\\\" + serverAddress + ":" + serverPort + "/mail/validate?code=" + code);
+                serverAddress + ":" + serverPort + "/open-api/mail/validate?code=" + code);
     }
 
     private EmailValidate createEmailValidate(String userName, Date currentDate) {

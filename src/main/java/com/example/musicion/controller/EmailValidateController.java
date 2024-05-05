@@ -58,7 +58,7 @@ public class EmailValidateController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/validate")
+    @GetMapping(value = "/mail/validate")
     public ModelAndView getValidateEmail(@RequestParam(value = "code") Long code) {
         ResponseEntity<HttpStatus> entity;
         if (code == null || code < 0) {
