@@ -29,10 +29,20 @@ public class WebSecurityConfiguration {
                         new CorsConfiguration().applyPermitDefaultValues()
                 )
         );
-        http.authorizeHttpRequests(req -> req.anyRequest().authenticated());
+        http.authorizeHttpRequests(req -> {
+            req.requestMatchers("/mail/**").permitAll();
+            req.requestMatchers("/swagger-ui/**").permitAll();
+            req.requestMatchers("/swagger-ui.html").permitAll();
+            req.requestMatchers("/v3/api-docs/**").permitAll();
+            req.anyRequest().authenticated();
+        });
         http.httpBasic(Customizer.withDefaults());
-        http.httpBasic(e->e.authenticationEntryPoint((request, response, authException) ->
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase())));
+        http.httpBasic(e -> e.authenticationEntryPoint((request, response, authException) -> {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getOutputStream().println(authException.getMessage());
+        }));
         http.formLogin(Customizer.withDefaults());
         return http.build();
     }

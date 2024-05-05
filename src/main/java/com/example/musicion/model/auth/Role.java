@@ -1,4 +1,4 @@
-package com.example.musicion.model;
+package com.example.musicion.model.auth;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

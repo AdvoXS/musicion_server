@@ -1,6 +1,6 @@
 package com.example.musicion.repository;
 
-import com.example.musicion.model.User;
+import com.example.musicion.model.auth.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

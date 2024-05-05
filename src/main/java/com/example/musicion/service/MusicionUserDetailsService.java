@@ -1,8 +1,9 @@
 package com.example.musicion.service;
 
-import com.example.musicion.model.Privilege;
-import com.example.musicion.model.Role;
-import com.example.musicion.model.User;
+import com.example.musicion.model.auth.Privilege;
+import com.example.musicion.model.auth.Role;
+import com.example.musicion.model.auth.User;
+import com.example.musicion.override.MusicionUserDetails;
 import com.example.musicion.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,15 @@ import java.util.List;
 
 @Service("userDetailsService")
 @Transactional
-public class MyUserDetailsService implements UserDetailsService {
+public class MusicionUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = username.contains("@") ? userRepository.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException(username))
-                : userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException(username));
+        User user = username.contains("@") ? userRepository.findByEmail(username.toLowerCase()).orElseThrow(()-> new UsernameNotFoundException(username))
+                : userRepository.findByUsername(username.toLowerCase()).orElseThrow(()-> new UsernameNotFoundException(username));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(), user.getPassword(),
-                true, true, true, true,
+        return new MusicionUserDetails(user, true, true, true,
                 getAuthorities(user.getRoles()));
     }
 
@@ -60,5 +59,4 @@ public class MyUserDetailsService implements UserDetailsService {
         }
         return authorities;
     }
-
 }

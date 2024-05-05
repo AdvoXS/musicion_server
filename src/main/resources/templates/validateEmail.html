@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение почты</title>
+    <style>
+        body {
+            background-color: #1E2423FF; /* Цвет фона веб-страницы */
+        }
+
+        .center {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        p {
+            color: white; /* Цвет текста */
+            font-size: 32px;
+            font-family: 'Roboto', serif;
+            height: 40px;
+            line-height: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div th:switch="${entity.getStatusCode().value()}">
+    <span>
+    <div th:case="'200'">
+        <p>Почта успешно подтверждена</p>
+    <p>
+       <a th:href="@{'http://'+${client_address}+':'+${client_port}}">Авторизоваться</a>
+    </p>
+    </div>
+
+    <p th:case="'410'">Срок ссылки истек</p>
+    <p th:case="'400'">Неверный код подтверждения</p>
+    <p th:case="'404'">Пользователь не найден</p>
+     </span>
+</div>
+</body>
+</html>

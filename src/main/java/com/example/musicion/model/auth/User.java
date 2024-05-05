@@ -1,10 +1,8 @@
-package com.example.musicion.model;
+package com.example.musicion.model.auth;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -21,7 +19,7 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "user_name", nullable = false, unique = true)
     private String username;
 
     @Column(name = "first_name", nullable = false)
@@ -45,6 +43,10 @@ public class User {
     private Date registerDate;
     @UpdateTimestamp
     private Date updateDate;
+
+    @NotNull
+    @Column(columnDefinition = "boolean default false")
+    private boolean isEnabled = false;
 
     @ManyToMany
     @JoinTable(
