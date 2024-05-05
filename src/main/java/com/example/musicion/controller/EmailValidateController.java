@@ -4,6 +4,8 @@ import com.example.musicion.model.auth.EmailValidate;
 import com.example.musicion.model.auth.User;
 import com.example.musicion.repository.EmailValidateRepository;
 import com.example.musicion.repository.UserRepository;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -37,9 +39,19 @@ public class EmailValidateController {
 
     @PostMapping("/validate")
     @NotBlank
+    @ApiResponse(responseCode = "200", description = "Письмо отправлено")
+    @ApiResponse(responseCode = "404", description = "Пользователь из тела запроса не найден")
+    @ApiResponse(responseCode = "409", description = "Пользователь из тела запроса уже активирован")
     @Tag(name = "Валидация почты", description = "Отправляет сообщение с ссылкой на подтверждение на почту")
     public ResponseEntity<HttpStatus> sendValidateEmail(@RequestBody UserNameData userNameData) {
         String userName = userNameData.userName;
+        Optional<User> userOptional = userRepository.findByUsername(userName);
+        if (!userOptional.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        User user = userOptional.get();
+        if (user.isEnabled())
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         List<EmailValidate> validateRecords = emailValidateRepository.findAllByUsername(userName);
         long currentTime = System.currentTimeMillis();
         Date currentDate = new Date(currentTime);
