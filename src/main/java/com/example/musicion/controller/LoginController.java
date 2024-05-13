@@ -25,7 +25,7 @@ public class LoginController {
         }
         Optional<User> foundedUser = userRepository.findByUsername(username);
         if (foundedUser.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(foundedUser.get(), HttpStatus.OK);
         }
         return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(),
                 "Пользователь '" + username + "' не найден"), HttpStatus.NOT_FOUND);
