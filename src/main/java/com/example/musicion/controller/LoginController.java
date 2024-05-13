@@ -1,6 +1,7 @@
 package com.example.musicion.controller;
 
 import com.example.musicion.model.auth.User;
+import com.example.musicion.override.AppError;
 import com.example.musicion.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,14 +18,16 @@ public class LoginController {
     UserRepository userRepository;
 
     @PostMapping("/checkUser")
-    public ResponseEntity<HttpStatus> findUser(@RequestBody String username) {
+    public ResponseEntity<?> findUser(@RequestBody String username) {
         if (username.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(),"Неправильно сформирован запрос"),
+                    HttpStatus.BAD_REQUEST);
         }
         Optional<User> foundedUser = userRepository.findByUsername(username);
         if (foundedUser.isPresent()) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(),
+                "Пользователь '" + username + "' не найден"), HttpStatus.NOT_FOUND);
     }
 }
